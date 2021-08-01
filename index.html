@@ -1,0 +1,103 @@
+<!doctype html>
+<title>Ukrtwi Duptsi</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  html {
+    width: 100%;
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 16px);
+    align-items: center;
+  }
+
+  #map {
+    display: flex;
+    align-items: center;
+  }
+
+  svg path:hover {
+    stroke-width: 3;
+    stroke: red;
+  }
+
+  @media (min-width: 601px) {
+    footer {
+      width: 600px;
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<div style="flex-grow: 1" id="map"></div>
+<footer>
+  Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  Donec
+  hendrerit tempor tellus.  Donec pretium posuere tellus.  Proin quam
+  nisl, tincidunt et, mattis eget, convallis nec, purus.  Cum sociis
+  natoque penatibus et magnis dis parturient montes, nascetur
+  ridiculus mus.  Nulla posuere.  Donec vitae dolor.  Nullam tristique
+  diam non turpis.  Cras placerat accumsan nulla.  Nullam rutrum.  Nam
+  vestibulum accumsan nisl.
+</footer>
+
+<svg width="0" height="0">
+  <defs>
+    <pattern id="Kyiv" height="1" width="1">
+      <image href="cat.webp" x="0" y="-5" height="100" width="90"></image>
+    </pattern>
+  </defs>
+</svg>
+
+<script type="module">
+  class Mapa {
+      fetch() {
+          fetch('map.json').then( r => r.json()).then( v => this.data = v)
+      }
+
+      photo(id) {
+          return (node) => {
+              if (!this.data) return
+              console.log(id, this.data[id])
+          }
+      }
+
+      draw(node) {
+          let img = this.data[node.id]; if (!img) return
+          let svg = `<svg width="0" height="0">
+  <defs>
+    <pattern id="img_${node.id}" height="1" width="1" >
+      <image href="${img.file}" x="${img.x || 0}" y="${img.y || 0}" height="${img.height || 100}" width="${img.width || 100}" />
+    </pattern>
+  </defs>
+</svg>`
+          let el = document.createElement('div')
+          document.body.appendChild(el)
+          el.innerHTML = svg
+          node.style.fill = `url(#img_${node.id})`
+      }
+  }
+
+  function svg_title_add(node) {
+      let t = document.createElementNS('http://www.w3.org/2000/svg', 'title')
+      t.innerHTML = node.id
+      node.appendChild(t)
+  }
+
+  let mapa = new Mapa()
+  await mapa.fetch()
+  await fetch('map.svg').then( r => r.text()).then( v => {
+      document.querySelector('#map').innerHTML = v
+  })
+
+  document.querySelectorAll('svg path').forEach( node => {
+      node.onclick = mapa.photo(node.id)
+      mapa.draw(node)
+      svg_title_add(node)
+  })
+</script>
