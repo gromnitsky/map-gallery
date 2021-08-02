@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "adieu": "^0.0.5",
+    "dialog-polyfill": "^0.5.6"
+  }
+}
