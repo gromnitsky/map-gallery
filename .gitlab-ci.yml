@@ -1,0 +1,13 @@
+---
+image: "node:lts-alpine"
+pages:
+  stage: deploy
+  script:
+    - npm i --no-audit
+    - make out=public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
+---
