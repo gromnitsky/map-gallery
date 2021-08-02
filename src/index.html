@@ -68,9 +68,25 @@
               window.open(`https://twitter.com/${account}`, '_blank')
           }
       }
-      update(file_url) { this.dlg.querySelector('img').src = file_url }
-      open() { this.dlg.showModal() }
-      close() { this.dlg.close() }
+
+      url_update(id) {
+          let url = new URL(location.href)
+          url.searchParams[id ? 'set' : 'delete']('popup', id)
+          history.replaceState({}, null, url)
+      }
+
+      open(id, file_url) {
+          if (!file_url) return
+
+          this.url_update(id)
+          this.dlg.querySelector('img').src = file_url
+          this.dlg.showModal()
+      }
+
+      close() {
+          this.dlg.close()
+          this.url_update() // remove `?popup=foo`
+      }
   }
 
   class Mapa {
@@ -81,11 +97,10 @@
       }
 
       photo(id) {
-          return (node) => {
+          return () => {
               let img = this.data?.[id]; if (!img) return
               console.log(id, img)
-              this.popup.update(img.file)
-              this.popup.open()
+              this.popup.open(id, img.file)
           }
       }
 
@@ -122,6 +137,10 @@
       mapa.draw(node)
       svg_title_add(node)
   })
+
+  // a poor man's router
+  let id = new URLSearchParams(location.search).get('popup')
+  if (id) mapa.photo(id)()
 </script>
 
 <script src="node_modules/dialog-polyfill/dist/dialog-polyfill.js"></script>
