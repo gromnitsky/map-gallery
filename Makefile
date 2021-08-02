@@ -14,3 +14,8 @@ define copy =
 @mkdir -p $(dir $@)
 cp $< $@
 endef
+
+
+
+upload: all
+	rsync -avPL --delete -e ssh $(out)/ gromnitsky@web.sourceforge.net:/home/user-web/gromnitsky/htdocs/js/examples/map-gallery/
