@@ -30,17 +30,12 @@
   }
 
   footer { margin-top: 1em; }
+  a { text-decoration: none; }
 </style>
 
 <div id="map"></div>
 <footer>
-  Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  Donec
-  hendrerit tempor tellus.  Donec pretium posuere tellus.  Proin quam
-  nisl, tincidunt et, mattis eget, convallis nec, purus.  Cum sociis
-  natoque penatibus et magnis dis parturient montes, nascetur
-  ridiculus mus.  Nulla posuere.  Donec vitae dolor.  Nullam tristique
-  diam non turpis.  Cras placerat accumsan nulla.  Nullam rutrum.  Nam
-  vestibulum accumsan nisl.
+  <a href="https://github.com/gromnitsky/map-gallery">Github</a>
 </footer>
 
 <dialog id="popup">
@@ -132,7 +127,7 @@
       document.querySelector('#map').innerHTML = v
   })
 
-  document.querySelectorAll('svg path').forEach( node => {
+  document.querySelectorAll('#map svg path').forEach( node => {
       node.onclick = mapa.photo(node.id)
       mapa.draw(node)
       svg_title_add(node)
