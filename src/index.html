@@ -5,21 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" type="text/css" href="node_modules/dialog-polyfill/dist/dialog-polyfill.css">
 <style>
-  #map { display: flex; }
-
   #map svg {
-    height: calc(100vh - 16px);
-    width: calc(100vw - 16px);
-  }
-
-  #map svg path:hover {
-    stroke-width: 3;
-    stroke: red;
-  }
-
-  dialog img {
-    max-width: calc(100vw - 3*16px);
-    max-height: calc(100vh - 4*16px - 2rem);
+    height: calc(100vh - 8*3px);
+    width: calc(100vw - 8*3px);
   }
 
   @media (min-width: 601px) {
@@ -38,104 +26,9 @@
   <a href="https://github.com/gromnitsky/map-gallery">Github</a>
 </footer>
 
-<dialog id="popup">
-  <header style="margin-bottom: 1em">
-    <button id="popup__close">Close</button>
-    <button id="popup__twitter">Open Twitter account</button>
-  </header>
-  <div><img id="popup__photo"></div>
-</dialog>
-
 <script type="module">
-  class Popup {
-      constructor() {
-          this.dlg = document.querySelector('#popup')
-          dialogPolyfill.registerDialog(this.dlg)
-
-          let close = document.querySelector('#popup__close')
-          close.onclick = () => this.close()
-
-          let twitter = document.querySelector('#popup__twitter')
-          twitter.onclick = () => {
-              this.close()
-              let account = this.dlg.querySelector('img').src.split('/')
-                  .slice(-1)?.[0].replace(/\.[^.]+$/, '')
-              window.open(`https://twitter.com/${account}`, '_blank')
-          }
-      }
-
-      url_update(id) {
-          let url = new URL(location.href)
-          url.searchParams[id ? 'set' : 'delete']('popup', id)
-          history.replaceState({}, null, url)
-      }
-
-      open(id, file_url) {
-          if (!file_url) return
-
-          this.url_update(id)
-          this.dlg.querySelector('img').src = file_url
-          this.dlg.showModal()
-      }
-
-      close() {
-          this.dlg.close()
-          this.url_update() // remove `?popup=foo`
-      }
-  }
-
-  class Mapa {
-      constructor() { this.popup = new Popup() }
-
-      fetch() {
-          fetch('map.json').then( r => r.json()).then( v => this.data = v)
-      }
-
-      photo(id) {
-          return () => {
-              let img = this.data?.[id]; if (!img) return
-              console.log(id, img)
-              this.popup.open(id, img.file)
-          }
-      }
-
-      draw(node) {
-          let img = this.data?.[node.id]; if (!img) return
-          let svg = `<svg width="0" height="0" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <pattern id="img_${node.id}" height="1" width="1" >
-      <image href="${img.file}" x="${img.x || 0}" y="${img.y || 0}" height="${img.height || 100}" width="${img.width || 100}" />
-    </pattern>
-  </defs>
-</svg>`
-          let el = document.createElement('div')
-          document.body.appendChild(el)
-          el.innerHTML = svg
-          node.style.fill = `url(#img_${node.id})`
-      }
-  }
-
-  function svg_title_add(node) {
-      let t = document.createElementNS('http://www.w3.org/2000/svg', 'title')
-      t.innerHTML = node.id
-      node.appendChild(t)
-  }
-
-  let mapa = new Mapa()
-  await mapa.fetch()
-  await fetch('map.svg').then( r => r.text()).then( v => {
-      document.querySelector('#map').innerHTML = v
-  })
-
-  document.querySelectorAll('#map svg path').forEach( node => {
-      node.onclick = mapa.photo(node.id)
-      mapa.draw(node)
-      svg_title_add(node)
-  })
-
-  // a poor man's router
-  let id = new URLSearchParams(location.search).get('popup')
-  if (id) mapa.photo(id)()
+  import inject from './map-gallery.js'
+  inject(document.querySelector('#map'))
 </script>
 
 <script src="node_modules/dialog-polyfill/dist/dialog-polyfill.js"></script>
