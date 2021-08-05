@@ -1,28 +1,46 @@
 /* global dialogPolyfill */
 
-export default async function(node, url = 'map.svg') {
-    let areas = await areas_fetch()
-    svg_defs(node, areas)
+customElements.define('map-gallery', class extends HTMLElement {
+    constructor() {
+        super()
+
+        let shadow_root = this.attachShadow({mode: 'open'})
+        shadow_root.innerHTML = `
+<style>
+:host {
+  display: block;
+}
+
+dialog img {
+  max-width: calc(100vw - 3*16px);
+  max-height: calc(100vh - 4*16px - 2rem);
+}
+</style>`
+        inject(shadow_root, this.getAttribute('map') || 'map.svg',
+               this.getAttribute('areas') || 'map.json')
+    }
+})
+
+async function inject(parent_node, map_url, areas_url) {
+    let areas = await fetch(areas_url).then( r => r.json())
+    svg_defs(parent_node, areas) // inject svg <def>
 
     let map = document.createElement('div')
-    node.appendChild(map)
+    parent_node.appendChild(map)
 
-    style_inject(node)
-    let popup = new Popup(node)
+    let popup = new Popup(parent_node)
 
     // inject an svg map
-    await fetch(url).then( r => r.text()).then( v => map.innerHTML = v)
+    map.innerHTML = await fetch(map_url).then( r => r.text())
+    map.querySelector('svg').setAttribute('part', 'map')
 
     // update map areas
-    Array.from(map.querySelectorAll('.MapGallery__area'))
-        .filter(v => areas[v.id]).forEach( region => {
+    let areas_nodes = map.querySelectorAll('.MapGallery__area')
+    areas_nodes.forEach( node => node.setAttribute('part', 'map-area'))
+    Array.from(areas_nodes).filter(v => areas[v.id]).forEach( region => {
             region.onclick = popup.register(areas[region.id].file)
             region.style.fill = `url(#MapGallery__pattern__${region.id})`
         })
-}
-
-function areas_fetch(url = 'map.json') {
-    return fetch(url).then( r => r.json())
 }
 
 function svg_defs(parent_node, areas) {
@@ -59,7 +77,7 @@ class Popup {
 
     inject(parent_node) {
         this.dlg = document.createElement('dialog')
-        this.dlg.id = 'MapGallery__popup'
+        this.dlg.setAttribute('part', 'popup')
         this.dlg.innerHTML = `<header style="margin-bottom: 1em">
 <button id="MapGallery__popup__close">Close</button>
 <button id="MapGallery__popup__twitter">Open Twitter account</button>
@@ -80,22 +98,6 @@ class Popup {
     close() { this.dlg.close() }
 
     register(file) { return () => this.open(file) }
-}
-
-function style_inject(parent_node) {
-    let node = document.createElement('style')
-    node.innerHTML = `
-.MapGallery__area:hover {
-  stroke-width: 3;
-  stroke: red;
-}
-
-#MapGallery__popup img {
-  max-width: calc(100vw - 3*16px);
-  max-height: calc(100vh - 4*16px - 2rem);
-}
-`
-    parent_node.appendChild(node)
 }
 
 function e(str) {
