@@ -1,7 +1,7 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Map Gallery Example</title>
+<title>Map Gallery example with 1 map</title>
 <link rel="stylesheet" type="text/css" href="node_modules/dialog-polyfill/dist/dialog-polyfill.css">
 <style>
   map-gallery::part(map) {
@@ -14,15 +14,11 @@
     stroke: red;
   }
 
-  @media (min-width: 601px) {
-    footer {
-      width: 600px;
-      margin: 0 auto;
-    }
+  footer {
+    border-top: 1px solid lightgray;
+    margin-top: 1em;
+    text-align: center;
   }
-
-  footer { margin-top: 1em; }
-  a { text-decoration: none; }
 </style>
 
 <script type="module" src="./map-gallery.js"></script>

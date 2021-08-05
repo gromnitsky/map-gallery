@@ -33,6 +33,7 @@ async function inject(parent_node, map_url, areas_url) {
     // inject an svg map
     map.innerHTML = await fetch(map_url).then( r => r.text())
     map.querySelector('svg').setAttribute('part', 'map')
+    map.querySelector('svg').style.display = 'block'
 
     // update map areas
     let areas_nodes = map.querySelectorAll('.MapGallery__area')

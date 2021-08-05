@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Gallery example with 2 maps</title>
+<link rel="stylesheet" type="text/css" href="node_modules/dialog-polyfill/dist/dialog-polyfill.css">
+<style>
+  #ua map-gallery::part(map) {
+    height: calc(100vh - 8*3px);
+    width: calc(100vw - 8*3px);
+  }
+
+  map-gallery::part(map-area):hover {
+    stroke-width: 3;
+    stroke: red;
+  }
+
+  #cats::part(map) {
+    margin: 0 auto;
+    max-width: calc(100vw - 8*3px);
+  }
+
+  footer {
+    border-top: 1px solid lightgray;
+    margin-top: 1em;
+    text-align: center;
+  }
+</style>
+
+<script type="module" src="./map-gallery.js"></script>
+
+<div id="ua">
+  <map-gallery></map-gallery>
+</div>
+
+<map-gallery id="cats" map="second.svg" areas="second.json"></map-gallery>
+
+<footer>
+  <a href="https://github.com/gromnitsky/map-gallery">Github</a>
+</footer>
+
+<script src="node_modules/dialog-polyfill/dist/dialog-polyfill.js"></script>
