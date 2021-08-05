@@ -40,7 +40,7 @@ async function inject(parent_node, map_url, areas_url) {
     areas_nodes.forEach( node => node.setAttribute('part', 'map-area'))
     Array.from(areas_nodes).filter(v => areas[v.id]).forEach( region => {
             region.onclick = popup.register(areas[region.id].file)
-            region.style.fill = `url(#MapGallery__pattern__${region.id})`
+            region.style.fill = e`url(#MapGallery__pattern__${region.id})`
         })
 }
 
@@ -55,7 +55,7 @@ function svg_defs(parent_node, areas) {
 
 function svg_patterns(areas) {
     let pattern = (area_id, area) => {
-        return `<pattern id="MapGallery__pattern__${e(area_id)}" height="1" width="1" ><image href="${e(area.file)}" x="${e(area.x) || 0}" y="${e(area.y) || 0}" height="${e(area.height) || 100}" width="${e(area.width) || 100}" /></pattern>`
+        return e`<pattern id="MapGallery__pattern__${area_id}" height="1" width="1"><image href="${area.file}" x="${area.x || 0}" y="${area.y || 0}" height="${area.height || 100}" width="${area.width || 100}"></pattern>`
     }
     return Object.keys(areas).map( id => pattern(id, areas[id]))
 }
@@ -72,7 +72,7 @@ class Popup {
             this.close()
             let account = this.dlg.querySelector('img').src.split('/')
                 .slice(-1)?.[0].replace(/\.[^.]+$/, '')
-            window.open(`https://twitter.com/${e(account)}`, '_blank')
+            window.open(e`https://twitter.com/${account}`, '_blank')
         }
     }
 
@@ -101,7 +101,13 @@ class Popup {
     register(file) { return () => this.open(file) }
 }
 
-function e(str) {
-    let map = {'&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot', "'": 'apos'}
-    return String(str == null ? '' : str).replace(/[&<>"']/g, s=>`&${map[s]};`)
+function e(strings, ...values) {
+    let escape = (str) => {
+        let map = {'&': 'amp', '<': 'lt', '>': 'gt', '"': 'quot', "'": 'apos'}
+        return String(str == null ? '' : str).replace(/[&<>"']/g, s => `&${map[s]};`)
+    }
+    return strings.reduce( (acc, cur, idx) => {
+        acc.push(cur); acc.push(escape(values[idx]))
+        return acc
+    }, []).join('')
 }
