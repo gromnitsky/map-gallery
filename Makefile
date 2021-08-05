@@ -5,7 +5,7 @@ static.dest := $(patsubst examples/%, $(out)/%, $(static.src)) $(out)/map-galler
 $(out)/%: examples/%; $(copy)
 $(out)/%: %; $(copy)
 
-vendor.src := $(shell node_modules/.bin/adieu -pe '$$("link,script").map((_,e) => $$(e).attr("href") || $$(e).attr("src")).get().filter(v => /node_modules/.test(v)).join`\n`' examples/single.html)
+vendor.src := $(shell adieu -pe '$$("link,script").map((_,e) => $$(e).attr("href") || $$(e).attr("src")).get().filter(v => /node_modules/.test(v)).join`\n`' examples/single.html)
 vendor.dest := $(addprefix $(out)/, $(vendor.src))
 $(out)/node_modules/%: node_modules/%; $(copy)
 
