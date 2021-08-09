@@ -15,7 +15,18 @@ dialog img {
   max-width: calc(100vw - 3*16px);
   max-height: calc(100vh - 4*16px - 2rem);
 }
-</style>`
+</style>
+
+<slot>
+  <dialog part="popup">
+    <header style="margin-bottom: 1em">
+      <button id="MapGallery__popup__close">Close</button>
+      <button id="MapGallery__popup__twitter">Open Twitter account</button>
+    </header>
+    <div><img></div>
+  </dialog>
+</slot>
+`
         inject(shadow_root, this.getAttribute('map') || 'map.svg',
                this.getAttribute('areas') || 'map.json')
     }
@@ -61,33 +72,26 @@ function svg_patterns(areas) {
 }
 
 class Popup {
-    constructor(parent_node) {
-        this.inject(parent_node)
+    constructor(shadow_root) {
+        this.dlg = shadow_root.querySelector('slot')
+            .assignedNodes({flatten: true})
+            .filter( v => v.tagName === 'DIALOG')?.[0]
+
+        if (typeof dialogPolyfill !== 'undefined')
+            dialogPolyfill.registerDialog(this.dlg)
 
         let close = this.dlg.querySelector('#MapGallery__popup__close')
         close.onclick = () => this.close()
 
         let twitter = this.dlg.querySelector('#MapGallery__popup__twitter')
-        twitter.onclick = () => {
-            this.close()
-            let account = this.dlg.querySelector('img').src.split('/')
-                .slice(-1)?.[0].replace(/\.[^.]+$/, '')
-            window.open(e`https://twitter.com/${account}`, '_blank')
+        if (twitter) {
+            twitter.onclick = () => {
+                this.close()
+                let account = this.dlg.querySelector('img').src.split('/')
+                    .slice(-1)?.[0].replace(/\.[^.]+$/, '')
+                window.open(e`https://twitter.com/${account}`, '_blank')
+            }
         }
-    }
-
-    inject(parent_node) {
-        this.dlg = document.createElement('dialog')
-        this.dlg.setAttribute('part', 'popup')
-        this.dlg.innerHTML = `<header style="margin-bottom: 1em">
-<button id="MapGallery__popup__close">Close</button>
-<button id="MapGallery__popup__twitter">Open Twitter account</button>
-</header>
-<div><img></div>`
-        parent_node.appendChild(this.dlg)
-
-        if (typeof dialogPolyfill !== 'undefined')
-            dialogPolyfill.registerDialog(this.dlg)
     }
 
     open(file_url) {

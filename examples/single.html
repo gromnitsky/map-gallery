@@ -14,6 +14,11 @@
     stroke: red;
   }
 
+  dialog img {
+    max-width: calc(100vw - 3*16px);
+    max-height: calc(100vh - 4*16px - 2rem);
+  }
+
   footer {
     border-top: 1px solid lightgray;
     margin-top: 1em;
@@ -23,7 +28,12 @@
 
 <script type="module" src="./map-gallery.js"></script>
 
-<map-gallery></map-gallery>
+<map-gallery>
+  <dialog>
+    <img style="display: block; margin-bottom: 1em">
+    <button id="MapGallery__popup__close">Close</button>
+  </dialog>
+</map-gallery>
 
 <footer>
   <a href="https://github.com/gromnitsky/map-gallery">Github</a>
